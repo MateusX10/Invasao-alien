@@ -26,6 +26,10 @@ def colisao():
         text = font.render("Pontuação: " + str(pontuacao), True, (0, 255, 0), (0,0,0))
         return True
 
+
+
+
+
     # Se o missil lançado pelo player acertar a nave inimiga, ele ganhará
     # Pontos e a nave inimiga "desaparecerá" por um breve instante
     elif missil_rect.colliderect(inimigo_rect):
@@ -46,10 +50,39 @@ def colisao():
         return False
 
 
+def VerificaSeArquivoExiste():
+    from os import path
+    
+    if not path.isfile("score.txt"):
+        try:
+            arquivo = open("score.txt", "a+")
+        except:
+            print(f"\033[1;31mOcorreu um erro ao criar o arquivo\033[m")
+
+        else:
+            print("\033[1;32mArquivo criado com sucesso!\033[m")
+
+        finally:
+            arquivo.close()
+
+
+def MarcaPontos(pontos):
+    from datetime import datetime
+
+    horario = datetime.now()
+    
+    try:
+        arquivo = open("score.txt", "a")
+
+    except (FileNotFoundError):
+        print("\033[1;31mOcorreu um erro ao escrever no arquivo.\033[m")
+    
+    else:
+        arquivo.write(f"{horario}{pontos:>10} pontos\n")
 
 #define o tamanho da janela (800X600 no caso)
 janela = pygame.display.set_mode((960, 540)) 
-
+VerificaSeArquivoExiste()
 
 
 
@@ -66,15 +99,17 @@ musica = pygame.mixer.music.load("musica_espaço_sideral2.mp3")
 # Toca a música
 mixer.music.play()
 #Carrega a imagem do plano de fundo do jogo
-background_image = pygame.image.load("/home/mateus/Documentos/computação/programacao/python/exs/jogo da nave/background.png")
+background_image = pygame.image.load("/home/luffy/Documentos/programação/python/ataque_alien/background.png")
 #Carrega a imagem da nave do player
-nave_player = pygame.image.load("/home/mateus/Documentos/computação/programacao/python/exs/jogo da nave/nave_pequena.png")
+nave_player = pygame.image.load("nave_pequena.png")
 #Carrega a imagem da nave inimiga
-nave_inimiga = pygame.image.load("/home/mateus/Documentos/computação/programacao/python/exs/jogo da nave/nave inimiga pequena.png")
+nave_inimiga = pygame.image.load("nave_inimiga_pequena.png")
 #Carrega o míssil
-missil = pygame.image.load("/home/mateus/Documentos/computação/programacao/python/exs/jogo da nave/missil pequeno.png")
+missil = pygame.image.load("missil pequeno.png")
 # Altera o tamanho da imagem para 30X30
 missil = pygame.transform.scale(missil, (30,30))
+
+
 
 #posição da nave do player
 pos_x_player = 400
@@ -112,8 +147,11 @@ while loop:
         segundos += 1
         contador = 0
 
-    if segundos == 300:
-        quit()
+    if segundos == 300: #300
+        MarcaPontos(pontuacao)
+       
+        break
+        
 
     if segundos == 60:
         vel_nave_inimigo = 6
@@ -144,7 +182,7 @@ while loop:
     # 4º argumento: cor da fonte será verde
     # 5º argumento: cor do fundo será preto
     text = font.render("Pontuação: " + str(pontuacao), True, (0, 255, 0), (0,0,0))
-    # Este será o retângulo para o nosso texto
+    # Este será o retângulo pzara o nosso texto
     text_Rect = text.get_rect()
     #Arg1: pos x, arg2: pos y
     text_Rect.center = (75, 10)
@@ -156,6 +194,7 @@ while loop:
     # Para cada evento/ação realizada pelo usuário na janela, se o usuário cliclar no "X" ou clicar na tecla "E", o jogo irá fechar
     for events in pygame.event.get():
         if events.type == pygame.QUIT or teclas[pygame.K_q] or nave_player_morreu:
+            MarcaPontos(pontuacao)
             loop = False
 
 
@@ -268,4 +307,5 @@ while loop:
 # O jogo fecha
 if nave_player_morreu:
     sleep(1)
-    quit()
+
+
