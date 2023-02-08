@@ -23,7 +23,6 @@ def colisao():
     if inimigo_rect.y > 500:
         pontuacao -= 5
         print(pontuacao)
-        text = font.render("Pontuação: " + str(pontuacao), True, (0, 255, 0), (0,0,0))
         return True
 
 
@@ -66,7 +65,10 @@ def VerificaSeArquivoExiste():
             arquivo.close()
 
 
-def MarcaPontos(pontos):
+def MarcaPontos(pontos): # arrumar código da função
+    '''from time import sleep'''
+    global segundos
+    situacao = ' '
     from datetime import datetime
 
     horario = datetime.now()
@@ -78,7 +80,48 @@ def MarcaPontos(pontos):
         print("\033[1;31mOcorreu um erro ao escrever no arquivo.\033[m")
     
     else:
-        arquivo.write(f"{horario}{pontos:>10} pontos\n")
+        if segundos >= 10: #300
+            situacao = "vitória"
+        else:
+            situacao = "derrota"
+
+        arquivo.write(f"{segundos} segundos {pontos:>10}{situacao:>15}\n")
+    
+
+   
+         # Define a fonte do tempo
+
+
+def MostraTextoNaTela(texto1, texto2, posx, posy, tamanho_fonte, atualizar_tela=True, tempo_tela_congelada=0):
+    ''' --> Mostra um texto na tela
+    :param texto1: texto que você quer que apareça na tela.Ex: "pontos: ", "tempo:", "vitórias: "
+    :param texto2: o texto que você quer mostrar na tela (depende do desempenho do jogador no jogo).Ex: 20, 30 (pontos)
+    :param posx: a posição em que o texto ficará no eixo x
+    :param posy: a posição em que o texto ficará no eixo y
+    :param tamanho_fonte: tamanho da fonte do texto que aparecerá na tela
+    :param atualizar_tela: atualiza ou não a tela
+    :param tempo_tela_congelada: (opcional) congela ou não a tela
+    :return: sem retorno
+    '''
+    from time import sleep
+    # Define a fonte do tempo
+    font2 = pygame.font.Font("freesansbold.ttf", tamanho_fonte)
+    # Concatena a string "tempo" com a string "segundos"
+    tempo = font2.render(f"{texto1}: " + str(texto2), True, (0,255,0), (0,0,0))
+    # O retângulo que ficará em volta do tempo
+    tempo_rect = tempo.get_rect()
+    # Posição do retângulo do tempo
+    tempo_rect.center = (posx, posy)
+    janela.blit(tempo, (tempo_rect))
+
+    #atualiza a tela
+    if atualizar_tela:
+        pygame.display.update()
+
+    #congela a tela
+    if tempo_tela_congelada:
+        pygame.display.update()
+        sleep(tempo_tela_congelada)
 
 #define o tamanho da janela (800X600 no caso)
 janela = pygame.display.set_mode((960, 540)) 
@@ -143,59 +186,59 @@ loop = True
 #Mantém a janela do jogo aberta enquanto o usuário não clicar em "fechar" ("x")
 while loop:
     contador += 1
+
     if (contador == 24):  #24
         segundos += 1
         contador = 0
 
-    if segundos == 300: #300
-        MarcaPontos(pontuacao)
-       
-        break
-        
-
-    if segundos == 60:
-        vel_nave_inimigo = 6
-
-    elif segundos == 120:
-        vel_nave_inimigo = 10
-
-    elif segundos == 180:
-        vel_nave_inimigo = 14
-
-    elif segundos == 240:
-        vel_nave_player = 15
-        vel_nave_inimigo = 20
-        
 
     # Define a fonte do tempo
-    font2 = pygame.font.Font("freesansbold.ttf", 18)
-    # Concatena a string "tempo" com a string "segundos"
-    tempo = font2.render("Tempo: " + str(segundos), True, (0,255,0), (0,0,0))
-    # O retângulo que ficará em volta do tempo
-    tempo_rect = tempo.get_rect()
-    # Posiçãp do retângulo do tempo
-    tempo_rect.center = (54, 40)
+    
+
+    #MostraTextoNaTela("Tempo: ", segundos, 54, 40, 18)
 
     # Primeiro argumento: é a fonte, segundo argumento: tamanho da fonte
-    font = pygame.font.Font('freesansbold.ttf', 18)
-    # 3º argumento: O "True" quer dizer "alta resolução"
-    # 4º argumento: cor da fonte será verde
-    # 5º argumento: cor do fundo será preto
-    text = font.render("Pontuação: " + str(pontuacao), True, (0, 255, 0), (0,0,0))
-    # Este será o retângulo pzara o nosso texto
-    text_Rect = text.get_rect()
-    #Arg1: pos x, arg2: pos y
-    text_Rect.center = (75, 10)
+   
+    #MostraTextoNaTela("Pontuação", pontuacao, 75, 100, 18)
 
 
+    
+   
+
+    
     # Reage as teclas pressionadas pelo usuário
     teclas = pygame.key.get_pressed()
 
     # Para cada evento/ação realizada pelo usuário na janela, se o usuário cliclar no "X" ou clicar na tecla "E", o jogo irá fechar
     for events in pygame.event.get():
-        if events.type == pygame.QUIT or teclas[pygame.K_q] or nave_player_morreu:
+        if events.type == pygame.QUIT or teclas[pygame.K_q] or nave_player_morreu or segundos >= 300:
             MarcaPontos(pontuacao)
+            MostraTextoNaTela("Pontuação", pontuacao, 483, 220, 35, atualizar_tela=False) 
+            MostraTextoNaTela("Tempo", segundos, 450, 275, 35, tempo_tela_congelada=10) 
             loop = False
+
+
+
+   
+    
+    # Se o tempo de jogo bater 60 segundos (1 minuto), a velocidade da nave inimiga aumenta
+    if segundos == 60:
+        vel_nave_inimigo = 6
+
+    # Se o tempo de jogo bater 120 segundos (2 minuto), a velocidade da nave inimiga aumenta
+    elif segundos == 120:
+        vel_nave_inimigo = 10
+
+    # Se o tempo de jogo bater 180 segundos (3 minuto), a velocidade da nave inimiga aumenta
+    elif segundos == 180:
+        vel_nave_inimigo = 14
+
+    # Se o tempo de jogo bater 240 segundos (4 minuto), a velocidade da nave inimiga aumenta
+    elif segundos == 240:
+        vel_nave_player = 15
+        vel_nave_inimigo = 20
+    
+
 
 
     # Faz a nave inimiga se movimentar
@@ -295,13 +338,10 @@ while loop:
     janela.blit(nave_inimiga, (pos_x_inimigo, pos_y_inimigo))
     # Desenha/insere o missil do player na janela do game
     janela.blit(missil, (pos_x_missil, pos_y_missil))
-    janela.blit(text, text_Rect)
-    janela.blit(tempo, tempo_rect)
-    
-
-
-    #atualizar a tela
-    pygame.display.update()
+    #janela.blit(text, text_Rect)
+    MostraTextoNaTela("Pontuação", pontuacao, 75, 10, 18, atualizar_tela=False)
+    MostraTextoNaTela("Tempo", segundos, 54, 40, 18)
+   
 
 # Se a nave do player morrer, a tela é congelada por 5 segundos.Após isso,
 # O jogo fecha
