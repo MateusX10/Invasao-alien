@@ -66,8 +66,7 @@ def VerificaSeArquivoExiste():
 
 
 def MarcaPontos(pontos): # arrumar código da função
-    '''from time import sleep'''
-    global segundos
+    global segundos, situacao
     situacao = ' '
     from datetime import datetime
 
@@ -80,7 +79,7 @@ def MarcaPontos(pontos): # arrumar código da função
         print("\033[1;31mOcorreu um erro ao escrever no arquivo.\033[m")
     
     else:
-        if segundos >= 10: #300
+        if segundos >= 300: #300
             situacao = "vitória"
         else:
             situacao = "derrota"
@@ -92,13 +91,16 @@ def MarcaPontos(pontos): # arrumar código da função
          # Define a fonte do tempo
 
 
-def MostraTextoNaTela(texto1, texto2, posx, posy, tamanho_fonte, atualizar_tela=True, tempo_tela_congelada=0):
+def MostraTextoNaTela(texto1='', texto2='', posx=0, posy=0, tamanho_fonte=10, vermelho=0, verde=255, azul=0, atualizar_tela=True, tempo_tela_congelada=0):
     ''' --> Mostra um texto na tela
     :param texto1: texto que você quer que apareça na tela.Ex: "pontos: ", "tempo:", "vitórias: "
     :param texto2: o texto que você quer mostrar na tela (depende do desempenho do jogador no jogo).Ex: 20, 30 (pontos)
     :param posx: a posição em que o texto ficará no eixo x
     :param posy: a posição em que o texto ficará no eixo y
     :param tamanho_fonte: tamanho da fonte do texto que aparecerá na tela
+    :param vermelho: cor do texto a aparecer na tela (vermelho)
+    :param verde: cor do texto a aparecer na tela (verde)
+    :param azul: cor do textoa aparecer na tela (azul)
     :param atualizar_tela: atualiza ou não a tela
     :param tempo_tela_congelada: (opcional) congela ou não a tela
     :return: sem retorno
@@ -107,7 +109,10 @@ def MostraTextoNaTela(texto1, texto2, posx, posy, tamanho_fonte, atualizar_tela=
     # Define a fonte do tempo
     font2 = pygame.font.Font("freesansbold.ttf", tamanho_fonte)
     # Concatena a string "tempo" com a string "segundos"
-    tempo = font2.render(f"{texto1}: " + str(texto2), True, (0,255,0), (0,0,0))
+    if str(texto2).strip() == '':
+        tempo = font2.render(f"{texto1}", True, (vermelho,verde,azul), (0,0,0))
+    else:
+        tempo = font2.render(f"{texto1}: " + str(texto2), True, (0,255,0), (0,0,0))
     # O retângulo que ficará em volta do tempo
     tempo_rect = tempo.get_rect()
     # Posição do retângulo do tempo
@@ -213,8 +218,13 @@ while loop:
     for events in pygame.event.get():
         if events.type == pygame.QUIT or teclas[pygame.K_q] or nave_player_morreu or segundos >= 300:
             MarcaPontos(pontuacao)
-            MostraTextoNaTela("Pontuação", pontuacao, 483, 220, 35, atualizar_tela=False) 
-            MostraTextoNaTela("Tempo", segundos, 450, 275, 35, tempo_tela_congelada=10) 
+            sleep(1)
+            if situacao == "derrota":
+                MostraTextoNaTela(f'{situacao}'.upper(), "", 473, 175, 40,vermelho=255, verde=0, atualizar_tela=False)#150
+            else:
+                MostraTextoNaTela(f'{situacao}'.upper(), "", 473, 175, 40,verde=255, atualizar_tela=False)#150
+            MostraTextoNaTela("Pontuação", pontuacao, 483, 245, 35, atualizar_tela=False) #220
+            MostraTextoNaTela("Tempo", segundos, 450, 300, 35, tempo_tela_congelada=10) #275
             loop = False
 
 
@@ -345,7 +355,7 @@ while loop:
 
 # Se a nave do player morrer, a tela é congelada por 5 segundos.Após isso,
 # O jogo fecha
-if nave_player_morreu:
-    sleep(1)
+'''if nave_player_morreu:
+    sleep(1)'''
 
 
