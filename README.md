@@ -8,6 +8,8 @@ Controles do jogo:
 
 - KEY RIGHT ou KEY D: move nave para à esquerda;
 
+- KEY Z: atira
+
 - KEY Q: fecha o jogo.
 
 
