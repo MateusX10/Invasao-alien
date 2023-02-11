@@ -26,9 +26,6 @@ def colisao():
         return True
 
 
-
-
-
     # Se o missil lançado pelo player acertar a nave inimiga, ele ganhará
     # Pontos e a nave inimiga "desaparecerá" por um breve instante
     elif missil_rect.colliderect(inimigo_rect):
@@ -132,10 +129,6 @@ def MostraTextoNaTela(texto1='', texto2='', posx=0, posy=0, tamanho_fonte=10, ve
 janela = pygame.display.set_mode((960, 540)) 
 VerificaSeArquivoExiste()
 
-
-
-
-
 #define o título da janela
 pygame.display.set_caption("Invasão Alien") 
 
@@ -178,9 +171,7 @@ vel_missil = 30 #30
 pos_x_missil = pos_x_player
 pos_y_missil = pos_y_player
 
-pontuacao = contador = tempo = segundos = 0
-
-
+pontuacao = contador = tempo = segundos = 
 
 
 tiro_alvo = nave_player_morreu =  False
@@ -195,20 +186,6 @@ while loop:
     if (contador == 24):  #24
         segundos += 1
         contador = 0
-
-
-    # Define a fonte do tempo
-    
-
-    #MostraTextoNaTela("Tempo: ", segundos, 54, 40, 18)
-
-    # Primeiro argumento: é a fonte, segundo argumento: tamanho da fonte
-   
-    #MostraTextoNaTela("Pontuação", pontuacao, 75, 100, 18)
-
-
-    
-   
 
     
     # Reage as teclas pressionadas pelo usuário
@@ -349,13 +326,5 @@ while loop:
     # Desenha/insere o missil do player na janela do game
     janela.blit(missil, (pos_x_missil, pos_y_missil))
     #janela.blit(text, text_Rect)
-    MostraTextoNaTela("Pontuação", pontuacao, 75, 10, 18, atualizar_tela=False)
+    MostraTextoNaTela("Pontuação",pontuacao, 75, 10, 18, atualizar_tela=False)
     MostraTextoNaTela("Tempo", segundos, 54, 40, 18)
-   
-
-# Se a nave do player morrer, a tela é congelada por 5 segundos.Após isso,
-# O jogo fecha
-'''if nave_player_morreu:
-    sleep(1)'''
-
-
