@@ -8,9 +8,9 @@ Controles do jogo:
 
 - KEY RIGHT ou KEY D: move nave para à esquerda;
 
-- KEY Z: atira
+- KEY Z: atira;
 
 - KEY Q: fecha o jogo.
 
 
-O jogo dura 60 segundos (1 minuto).A cada minuto que se passar, a velocidade da nave inimiga é aumentada.
+O jogo dura 300 segundos (5 minutos).A cada minuto que se passar, a velocidade da nave inimiga é aumentada.
