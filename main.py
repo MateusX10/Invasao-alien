@@ -11,7 +11,7 @@ mixer.init()
 # Configura a colisão das naves e balas
 def colisao():
     global pontuacao, pos_x_inimigo, pos_y_inimigo, player_rect, inimigo_rect
-    global random_y, random_x, pos_y_player,nave_player_morreu
+    global random_y, random_x, pos_y_player,nave_player_morreu, pos_x_missil, pos_y_missil
 
     # Se a nave do player colidir com a nave inimiga, ele morrerá
 
@@ -29,10 +29,10 @@ def colisao():
 
 
 
-    # Se o missil lançado pelo player acertar a nave inimiga, ele ganhará
-    # Pontos e a nave inimiga "desaparecerá" por um breve instante
-    #elif missil_rect.colliderect(inimigo_rect):
-    #elif missil_rect.colliderect(inimigo_rect) or raio_laser_rect.colliderect(inimigo_rect):
+    # Se o missil lançado pelo player acertar a nave inimiga, ele ganhará Pontos e a nave inimiga "desaparecerá" por um breve
+    # instante
+    elif missil_rect.colliderect(inimigo_rect):
+        pos_y_missil -= 500
 
         pontuacao += 5
         pos_y_inimigo -= 1200        
@@ -44,7 +44,6 @@ def colisao():
             pos_y_inimigo -= 450
             pos_y_inimigo = random_y
             pos_x_inimigo = random_x
-        print(pontuacao) # VERIFICAR
         return 
         
 
@@ -54,9 +53,12 @@ def colisao():
         return False
 
 
+
+
 def VerificaSeArquivoExiste():
     from os import path
     
+    #Verifica se o arquivo existe
     if not path.isfile("score.txt"):
         try:
             arquivo = open("score.txt", "a+")
@@ -73,13 +75,11 @@ def VerificaSeArquivoExiste():
 def MarcaPontos(pontos): # arrumar código da função
     global segundos, situacao
     situacao = ' '
-    from datetime import datetime
-
-    horario = datetime.now()
     
     try:
         arquivo = open("score.txt", "a")
 
+    #Arquivo não encontrado
     except (FileNotFoundError):
         print("\033[1;31mOcorreu um erro ao escrever no arquivo.\033[m")
     
@@ -89,6 +89,7 @@ def MarcaPontos(pontos): # arrumar código da função
         else:
             situacao = "derrota"
 
+        #Escreve no arquivo "score.txt" o tempo (em segundos) alcançado pelo player no jogo, a pontuação e a situação (vitório ou derrota)
         arquivo.write(f"{segundos} segundos {pontos:>10}{situacao:>15}\n")
     
 
@@ -110,19 +111,18 @@ def MostraTextoNaTela(texto1='', texto2='', posx=0, posy=0, tamanho_fonte=10, ve
     :param tempo_tela_congelada: (opcional) congela ou não a tela
     :return: sem retorno
     '''
-    from time import sleep
     # Define a fonte do tempo
     font2 = pygame.font.Font("freesansbold.ttf", tamanho_fonte)
-    # Concatena a string "tempo" com a string "segundos"
+    # Concatena 2 strings
     if str(texto2).strip() == '':
-        tempo = font2.render(f"{texto1}", True, (vermelho,verde,azul), (0,0,0))
+        texto = font2.render(f"{texto1}", True, (vermelho,verde,azul), (0,0,0))
     else:
-        tempo = font2.render(f"{texto1}: " + str(texto2), True, (0,255,0), (0,0,0))
-    # O retângulo que ficará em volta do tempo
-    tempo_rect = tempo.get_rect()
-    # Posição do retângulo do tempo
-    tempo_rect.center = (posx, posy)
-    janela.blit(tempo, (tempo_rect))
+        texto = font2.render(f"{texto1}: " + str(texto2), True, (0,255,0), (0,0,0))
+    # O retângulo que ficará em volta do texto
+    texto_rect = texto.get_rect()
+    # Posição do retângulo 
+    texto_rect.center = (posx, posy)
+    janela.blit(texto, (texto_rect))
 
     #atualiza a tela
     if atualizar_tela:
@@ -197,7 +197,7 @@ pontuacao = contador = tempo = segundos = 0
 
 
 
-tiro_alvo_bala = nave_player_morreu =  tiro_alvo_laser = PrimeiroTiroDeBala = PrimeiroRaioLaser = False
+tiro_alvo_bala = nave_player_morreu =  PrimeiroTiroDeBala = False
 
 
 loop = True
@@ -211,24 +211,12 @@ while loop:
         contador = 0
 
 
-    # Define a fonte do tempo
-    
-
-    #MostraTextoNaTela("Tempo: ", segundos, 54, 40, 18)
-
-    # Primeiro argumento: é a fonte, segundo argumento: tamanho da fonte
-   
-    #MostraTextoNaTela("Pontuação", pontuacao, 75, 100, 18)
-
-
-    
-   
 
     
     # Reage as teclas pressionadas pelo usuário
     teclas = pygame.key.get_pressed()
 
-    # Para cada evento/ação realizada pelo usuário na janela, se o usuário cliclar no "X" ou clicar na tecla "E", o jogo irá fechar
+    # Para cada evento/ação realizada pelo usuário na janela, se o usuário cliclar no "Q" o jogo irá fechar
     for events in pygame.event.get():
         if events.type == pygame.QUIT or teclas[pygame.K_q] or nave_player_morreu or segundos >= 300:
             MarcaPontos(pontuacao)
@@ -299,7 +287,7 @@ while loop:
         pos_x_player += vel_nave_player 
 
     # Nave do player vai tirar caso a tecla pressionado seja o "ESPAÇO" ou "z"
-    if teclas[pygame.K_z]:
+    if teclas[pygame.K_z] or teclas[pygame.K_SPACE]:
         PrimeiroTiroDeBala = True
         tiro_alvo_bala = True
         som_tiro_nave = pygame.mixer.Sound("som de tiro da nave.mp3")
@@ -312,12 +300,7 @@ while loop:
             pos_x_missil = pos_x_player #REVISAR ESSA PARTE
 
         
-    '''if teclas[pygame.K_SPACE]:
-        PrimeiroRaioLaser = True
-        tiro_alvo_laser = True
-        if pos_y_raio_laser < 1:
-            pos_y_raio_laser = pos_y_player
-            pos_x_raio_laser = pos_x_player''' 
+   
             
         # Se o missil atirado pelo player ultrapassar a margem da tela,
         # Ele vai voltar para a posição do jogador para que possamos atirar
@@ -341,11 +324,11 @@ while loop:
     if pos_x_player >= 870:
         pos_x_player -= vel_nave_player
 
-    # Comentar mais tarde
+
+    #Configura a posição dos elementos do jogo, como a nave inimiga e o missil
     player_rect = nave_player.get_rect()
     inimigo_rect = nave_inimiga.get_rect()
     missil_rect = missil.get_rect()
-    #raio_laser_rect = raio_laser.get_rect()
 
     player_rect.y = pos_y_player
     player_rect.x = pos_x_player
@@ -355,17 +338,13 @@ while loop:
 
     missil_rect.y = pos_y_missil
     missil_rect.x = pos_x_missil
-    '''raio_laser_rect.y = pos_y_raio_laser
-    raio_laser_rect.x = pos_x_raio_laser'''
+ 
 
 
     # Se o player tiver clicado em "SPACE", o missil será atirado/irá se 
     #MOvimentar
     if tiro_alvo_bala:
         pos_y_missil -= vel_missil
-
-    '''if tiro_alvo_laser:
-        pos_y_raio_laser -= vel_raio_laser'''
 
     colisao()
 
@@ -380,15 +359,7 @@ while loop:
     # Desenha/insere o missil do player na janela do game
     if PrimeiroTiroDeBala:
         janela.blit(missil, (pos_x_missil, pos_y_missil))
-    '''if PrimeiroRaioLaser:
-        janela.blit(raio_laser, (pos_x_raio_laser, pos_y_raio_laser))'''
     MostraTextoNaTela("Pontuação", pontuacao, 75, 10, 18, atualizar_tela=False)
     MostraTextoNaTela("Tempo", segundos, 54, 40, 18)
    
-
-# Se a nave do player morrer, a tela é congelada por 5 segundos.Após isso,
-# O jogo fecha
-'''if nave_player_morreu:
-    sleep(1)'''
-
 
