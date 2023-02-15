@@ -26,9 +26,14 @@ def colisao():
         return True
 
 
+
+
+
     # Se o missil lançado pelo player acertar a nave inimiga, ele ganhará
     # Pontos e a nave inimiga "desaparecerá" por um breve instante
-    elif missil_rect.colliderect(inimigo_rect):
+    #elif missil_rect.colliderect(inimigo_rect):
+    #elif missil_rect.colliderect(inimigo_rect) or raio_laser_rect.colliderect(inimigo_rect):
+
         pontuacao += 5
         pos_y_inimigo -= 1200        
         som_explosao = pygame.mixer.Sound("som_explosao5.mp3")
@@ -42,6 +47,9 @@ def colisao():
         print(pontuacao) # VERIFICAR
         return 
         
+
+
+
     else:
         return False
 
@@ -129,6 +137,10 @@ def MostraTextoNaTela(texto1='', texto2='', posx=0, posy=0, tamanho_fonte=10, ve
 janela = pygame.display.set_mode((960, 540)) 
 VerificaSeArquivoExiste()
 
+
+
+
+
 #define o título da janela
 pygame.display.set_caption("Invasão Alien") 
 
@@ -147,8 +159,13 @@ nave_player = pygame.image.load("nave_pequena.png")
 nave_inimiga = pygame.image.load("nave_inimiga_pequena.png")
 #Carrega o míssil
 missil = pygame.image.load("missil pequeno.png")
+#raio_laser = pygame.image.load("raio_laser.png")
 # Altera o tamanho da imagem para 30X30
 missil = pygame.transform.scale(missil, (30,30))
+
+#raio_laser = pygame.transform.scale(raio_laser, (100, 540))
+
+
 
 
 
@@ -167,14 +184,20 @@ vel_nave_inimigo = 2
 
 #Velocidade do missil
 vel_missil = 30 #30
+#vel_raio_laser = 540
 # Posição do missil
-pos_x_missil = pos_x_player
-pos_y_missil = pos_y_player
-
-pontuacao = contador = tempo = segundos = 
+pos_x_missil = pos_x_raio_laser =  pos_x_missil2 = pos_x_player
+pos_y_missil = pos_y_raio_laser = pos_y_missil2 = pos_y_player
 
 
-tiro_alvo = nave_player_morreu =  False
+
+
+pontuacao = contador = tempo = segundos = 0
+
+
+
+
+tiro_alvo_bala = nave_player_morreu =  tiro_alvo_laser = PrimeiroTiroDeBala = PrimeiroRaioLaser = False
 
 
 loop = True
@@ -186,6 +209,20 @@ while loop:
     if (contador == 24):  #24
         segundos += 1
         contador = 0
+
+
+    # Define a fonte do tempo
+    
+
+    #MostraTextoNaTela("Tempo: ", segundos, 54, 40, 18)
+
+    # Primeiro argumento: é a fonte, segundo argumento: tamanho da fonte
+   
+    #MostraTextoNaTela("Pontuação", pontuacao, 75, 100, 18)
+
+
+    
+   
 
     
     # Reage as teclas pressionadas pelo usuário
@@ -262,20 +299,30 @@ while loop:
         pos_x_player += vel_nave_player 
 
     # Nave do player vai tirar caso a tecla pressionado seja o "ESPAÇO" ou "z"
-    if teclas[pygame.K_SPACE] or teclas[pygame.K_z]:
-        tiro_alvo = True
+    if teclas[pygame.K_z]:
+        PrimeiroTiroDeBala = True
+        tiro_alvo_bala = True
         som_tiro_nave = pygame.mixer.Sound("som de tiro da nave.mp3")
         if (pos_y_missil  - pos_y_player  < 60):
             som_tiro_nave.play()
-        
-            
-        # Se o missil atirado pelo player ultrapassar a margem da tela,
-        # Ele vai voltar para a posição do jogador para que possamos atirar
-        # Novamente
+
         if pos_y_missil < 1:
             #mixer.music.play()
             pos_y_missil = pos_y_player
             pos_x_missil = pos_x_player #REVISAR ESSA PARTE
+
+        
+    '''if teclas[pygame.K_SPACE]:
+        PrimeiroRaioLaser = True
+        tiro_alvo_laser = True
+        if pos_y_raio_laser < 1:
+            pos_y_raio_laser = pos_y_player
+            pos_x_raio_laser = pos_x_player''' 
+            
+        # Se o missil atirado pelo player ultrapassar a margem da tela,
+        # Ele vai voltar para a posição do jogador para que possamos atirar
+        # Novamente
+       
 
 
     # Cria uma barreira para evitar que a nave do player ultrapasse o limite do tamanho da região da janela no eixo y para cima
@@ -298,6 +345,7 @@ while loop:
     player_rect = nave_player.get_rect()
     inimigo_rect = nave_inimiga.get_rect()
     missil_rect = missil.get_rect()
+    #raio_laser_rect = raio_laser.get_rect()
 
     player_rect.y = pos_y_player
     player_rect.x = pos_x_player
@@ -307,11 +355,17 @@ while loop:
 
     missil_rect.y = pos_y_missil
     missil_rect.x = pos_x_missil
+    '''raio_laser_rect.y = pos_y_raio_laser
+    raio_laser_rect.x = pos_x_raio_laser'''
+
 
     # Se o player tiver clicado em "SPACE", o missil será atirado/irá se 
     #MOvimentar
-    if tiro_alvo:
+    if tiro_alvo_bala:
         pos_y_missil -= vel_missil
+
+    '''if tiro_alvo_laser:
+        pos_y_raio_laser -= vel_raio_laser'''
 
     colisao()
 
@@ -324,7 +378,17 @@ while loop:
     #Desenha/insere a nave inimiga na janela do game
     janela.blit(nave_inimiga, (pos_x_inimigo, pos_y_inimigo))
     # Desenha/insere o missil do player na janela do game
-    janela.blit(missil, (pos_x_missil, pos_y_missil))
-    #janela.blit(text, text_Rect)
-    MostraTextoNaTela("Pontuação",pontuacao, 75, 10, 18, atualizar_tela=False)
+    if PrimeiroTiroDeBala:
+        janela.blit(missil, (pos_x_missil, pos_y_missil))
+    '''if PrimeiroRaioLaser:
+        janela.blit(raio_laser, (pos_x_raio_laser, pos_y_raio_laser))'''
+    MostraTextoNaTela("Pontuação", pontuacao, 75, 10, 18, atualizar_tela=False)
     MostraTextoNaTela("Tempo", segundos, 54, 40, 18)
+   
+
+# Se a nave do player morrer, a tela é congelada por 5 segundos.Após isso,
+# O jogo fecha
+'''if nave_player_morreu:
+    sleep(1)'''
+
+
